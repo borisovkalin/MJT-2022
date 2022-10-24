@@ -5,7 +5,7 @@ import bg.sofia.uni.fmi.mjt.airbnb.accommodation.location.Location;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-public abstract class Accommodation implements Bookable{
+public abstract class Accommodation implements Bookable {
 
     private final String id;
     private final Location location;
@@ -14,7 +14,7 @@ public abstract class Accommodation implements Bookable{
     private double totalPrice;
     private boolean isBooked;
 
-    public Accommodation(String id, Location location, double pricePerNight){
+    public Accommodation(String id, Location location, double pricePerNight) {
         this.id = id;
         this.location = location;
         this.pricePerNight = pricePerNight;
@@ -37,23 +37,11 @@ public abstract class Accommodation implements Bookable{
 
     @Override
     public boolean book(LocalDateTime checkIn, LocalDateTime checkOut) {
-        if(isBooked){
+        if (isBooked) {
             return false;
         }
 
-        if(checkIn == null || checkOut == null) {
-            return false;
-        }
-
-        if(checkIn.isAfter(checkOut)){
-            return false;
-        }
-
-        if(checkIn.isBefore(LocalDateTime.now())){
-            return false;
-        }
-
-        if(checkIn.equals(checkOut)){
+        if (!validateDates(checkIn, checkOut)) {
             return false;
         }
 
@@ -61,14 +49,28 @@ public abstract class Accommodation implements Bookable{
 
         totalPrice = pricePerNight;
 
-        if(timeSpent != 0){
+        if (timeSpent != 0) {
             totalPrice *= timeSpent;
         }
-
         isBooked = true;
 
-
         return true;
+    }
+
+    private boolean validateDates(LocalDateTime checkIn, LocalDateTime checkOut) {
+        if (checkIn == null || checkOut == null) {
+            return false;
+        }
+
+        if (checkIn.isAfter(checkOut)) {
+            return false;
+        }
+
+        if (checkIn.isBefore(LocalDateTime.now())) {
+            return false;
+        }
+
+        return !checkIn.equals(checkOut);
     }
 
     @Override
