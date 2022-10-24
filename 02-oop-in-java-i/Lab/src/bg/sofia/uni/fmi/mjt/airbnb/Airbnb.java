@@ -1,14 +1,11 @@
 package bg.sofia.uni.fmi.mjt.airbnb;
 
-import bg.sofia.uni.fmi.mjt.airbnb.accommodation.Accommodation;
 import bg.sofia.uni.fmi.mjt.airbnb.accommodation.Bookable;
 import bg.sofia.uni.fmi.mjt.airbnb.filter.Criterion;
 
-import java.awt.print.Book;
-
 public class Airbnb implements AirbnbAPI{
 
-    private final Bookable[] accommodations;
+    private Bookable[] accommodations;
     public Airbnb(Bookable[] accommodations){
         this.accommodations = accommodations;
     }
@@ -51,10 +48,37 @@ public class Airbnb implements AirbnbAPI{
     }
 
     @Override
-    public Bookable[] filterAccommodations(Criterion... criteria) {//todo
-    
+    public Bookable[] filterAccommodations(Criterion... criteria) {//tod
+        long counter = 0;
+        for (Bookable accommodation : accommodations) {
+            boolean flag = true;
+            for(Criterion criterion : criteria){
+                if(!criterion.check(accommodation)){
+                    flag = false;
+                }
+            }
 
+            if(flag){
+                counter++;
+            }
+        }
+        Bookable[] result = new Bookable[(int)counter];
 
-        return new Bookable[0];
+        counter = 0L;
+        for (Bookable accommodation : accommodations) {
+            boolean flag = true;
+            for(Criterion criterion : criteria){
+                if(!criterion.check(accommodation)){
+                    flag = false;
+                }
+            }
+
+            if(flag){
+                result[(int)counter] = accommodation;
+                counter++;
+            }
+        }
+
+        return result;
     }
 }

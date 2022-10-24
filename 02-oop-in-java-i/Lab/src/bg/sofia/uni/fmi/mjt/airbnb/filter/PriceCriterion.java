@@ -13,8 +13,12 @@ public class PriceCriterion implements Criterion{
     }
 
     @Override
-    public boolean check(Bookable bookable) { //todo
-        return false;
+    public boolean check(Bookable bookable) {
+        if(bookable == null){
+            return false;
+        }
+
+        return bookable.getPricePerNight() >= minPrice && bookable.getPricePerNight() <= maxPrice;
     }
 
     public double getMinPrice() {
