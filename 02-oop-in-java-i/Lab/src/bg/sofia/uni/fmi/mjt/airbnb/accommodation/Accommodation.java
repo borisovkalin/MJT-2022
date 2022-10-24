@@ -12,7 +12,7 @@ public abstract class Accommodation implements Bookable{
     private final double pricePerNight;
 
     private double totalPrice;
-    private boolean booked;
+    private boolean isBooked;
 
     public Accommodation(String id, Location location, double pricePerNight){
         this.id = id;
@@ -32,12 +32,12 @@ public abstract class Accommodation implements Bookable{
 
     @Override
     public boolean isBooked() {
-        return booked;
+        return isBooked;
     }
 
     @Override
     public boolean book(LocalDateTime checkIn, LocalDateTime checkOut) {
-        if(booked){
+        if(isBooked){
             return false;
         }
 
@@ -61,7 +61,8 @@ public abstract class Accommodation implements Bookable{
             totalPrice *= timeSpent;
         }
 
-        booked = true;
+        isBooked = true;
+
 
         return true;
     }
@@ -75,4 +76,5 @@ public abstract class Accommodation implements Bookable{
     public double getPricePerNight() {
         return pricePerNight;
     }
+
 }
