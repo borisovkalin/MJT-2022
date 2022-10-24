@@ -53,6 +53,10 @@ public abstract class Accommodation implements Bookable{
             return false;
         }
 
+        if(checkIn.equals(checkOut)){
+            return false;
+        }
+
         long timeSpent = checkIn.until(checkOut, ChronoUnit.DAYS);
 
         totalPrice = pricePerNight;
