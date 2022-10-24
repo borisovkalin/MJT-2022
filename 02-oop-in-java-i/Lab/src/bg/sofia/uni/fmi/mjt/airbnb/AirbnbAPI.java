@@ -8,7 +8,6 @@ public interface AirbnbAPI {
      * Finds an accommodation by ID.
      *
      * @param id the unique ID of the bookable
-     *
      * @return the bookable with the specified id (the IDs are case-insensitive).
      * If the id is null or blank, or no accommodation with the specified id is found, return null.
      */
@@ -30,7 +29,6 @@ public interface AirbnbAPI {
      * Filters the accommodations by given criteria
      *
      * @param criteria the criteria to apply
-     *
      * @return an array of accommodations matching the specified criteria
      */
     Bookable[] filterAccommodations(Criterion... criteria);
