@@ -1,6 +1,14 @@
 package bg.sofia.uni.fmi.mjt.escaperoom;
 
+import bg.sofia.uni.fmi.mjt.escaperoom.exception.RoomNotFoundException;
+import bg.sofia.uni.fmi.mjt.escaperoom.exception.TeamNotFoundException;
+import bg.sofia.uni.fmi.mjt.escaperoom.room.EscapeRoom;
+import bg.sofia.uni.fmi.mjt.escaperoom.room.Review;
+import bg.sofia.uni.fmi.mjt.escaperoom.team.Team;
+
 public class EscapeRoomPlatform implements EscapeRoomAdminAPI,EscapeRoomPortalAPI{
+
+
     @Override
     public void addEscapeRoom(EscapeRoom room) {
 
@@ -30,6 +38,7 @@ public class EscapeRoomPlatform implements EscapeRoomAdminAPI,EscapeRoomPortalAP
     public void reviewEscapeRoom(String roomName, Review review) throws RoomNotFoundException {
 
     }
+
 
     @Override
     public Review[] getReviews(String roomName) throws RoomNotFoundException {
