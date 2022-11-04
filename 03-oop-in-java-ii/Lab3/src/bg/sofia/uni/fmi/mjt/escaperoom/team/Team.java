@@ -14,8 +14,8 @@ public class Team implements Ratable {
         this.members = members;
     }
 
-    public static Team of(String name,TeamMember[] members){
-        return new Team(name,members);
+    public static Team of(String name, TeamMember[] members) {
+        return new Team(name, members);
     }
 
     /**
@@ -25,7 +25,7 @@ public class Team implements Ratable {
      * @throws IllegalArgumentException if the points are negative.
      */
     public void updateRating(int points) {
-        if(points<0){
+        if (points < 0) {
             throw new IllegalArgumentException("Additional rating points need to be >= 0");
         }
 
@@ -42,5 +42,9 @@ public class Team implements Ratable {
      */
     public String getName() {
         return name;
+    }
+
+    public TeamMember[] getMembers() {
+        return members;
     }
 }

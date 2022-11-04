@@ -1,7 +1,7 @@
 package bg.sofia.uni.fmi.mjt.escaperoom.exception;
 
-public class RoomAlreadyExistsException extends Exception{
-    RoomAlreadyExistsException(String msg,Throwable err){
-        super(msg,err);
+public class RoomAlreadyExistsException extends Exception {
+    public RoomAlreadyExistsException(String msg) {
+        super(msg);
     }
 }

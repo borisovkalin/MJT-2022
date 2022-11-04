@@ -15,31 +15,32 @@ public class EscapeRoom implements Ratable {
     private Review[] reviews;
 
     public EscapeRoom(String name, Theme theme, Difficulty difficulty, int maxTimeToEscape, double priceToPlay,
-                      int maxReviewsCount){
+                      int maxReviewsCount) {
         this.name = name;
         this.theme = theme;
         this.difficulty = difficulty;
         this.maxTimeToEscape = maxTimeToEscape;
         this.priceToPlay = priceToPlay;
         this.maxReviewsCount = maxReviewsCount;
-        this.reviews = new Review[maxReviewsCount];
+        this.reviews = new Review[0];
     }
+
     @Override
     public double getRating() {
-        if(review_insert_index == 0){
+        if (review_insert_index == 0) {
             return 0d;
         }
 
         double result = 0d;
 
-        int endIDX = review_insert_index % maxReviewsCount;
 
-        for(int i = 0; i < endIDX; ++i){
-            result += reviews[i].rating();
+        for (Review a : reviews) {
+            result += a.rating();
         }
 
-        return result / (review_insert_index + 1);
+        return result / (double) (review_insert_index);
     }
+
     /**
      * Returns the name of the escape room.
      */
@@ -65,14 +66,7 @@ public class EscapeRoom implements Ratable {
      * Returns all user reviews stored for this escape room, in the order they have been added.
      */
     public Review[] getReviews() {
-        if(review_insert_index >= maxReviewsCount){
-            return reviews;
-        }
-        Review[] result = new Review[review_insert_index];
-
-        System.arraycopy(reviews, 0, result, 0, review_insert_index);
-
-        return result;
+        return reviews;
     }
 
     /**
@@ -86,9 +80,20 @@ public class EscapeRoom implements Ratable {
      * @param review the user review to add.
      */
     public void addReview(Review review) {
+        if (review_insert_index >= maxReviewsCount) {
+            //LOGIC Crashes here
+            Review[] resultArr = new Review[maxReviewsCount];
+            System.arraycopy(reviews, 1, resultArr, 0, maxReviewsCount - 1);
+            resultArr[maxReviewsCount - 1] = review;
+            reviews = resultArr;
+            review_insert_index++;
+            return;
+        }
 
-        reviews[review_insert_index % maxReviewsCount] = review;
-        review_insert_index++;
+        Review[] resultRev = new Review[++review_insert_index];
+        System.arraycopy(reviews, 0, resultRev, 0, review_insert_index - 1);
+        resultRev[review_insert_index - 1] = review;
+        reviews = resultRev;
     }
 
     public Theme getTheme() {
