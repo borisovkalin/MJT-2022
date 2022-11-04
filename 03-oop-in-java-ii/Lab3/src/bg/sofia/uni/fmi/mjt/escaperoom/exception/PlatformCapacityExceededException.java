@@ -1,7 +1,7 @@
 package bg.sofia.uni.fmi.mjt.escaperoom.exception;
 
-public class PlatformCapacityExceededException extends Exception{
-    PlatformCapacityExceededException(String msg,Throwable err){
-        super(msg,err);
+public class PlatformCapacityExceededException extends RuntimeException {
+    public PlatformCapacityExceededException(String msg) {
+        super(msg);
     }
 }

@@ -1,11 +1,10 @@
 package bg.sofia.uni.fmi.mjt.escaperoom;
 
-import bg.sofia.uni.fmi.mjt.escaperoom.exception.RoomNotFoundException;
 import bg.sofia.uni.fmi.mjt.escaperoom.exception.PlatformCapacityExceededException;
 import bg.sofia.uni.fmi.mjt.escaperoom.exception.RoomAlreadyExistsException;
+import bg.sofia.uni.fmi.mjt.escaperoom.exception.RoomNotFoundException;
 import bg.sofia.uni.fmi.mjt.escaperoom.exception.TeamNotFoundException;
 import bg.sofia.uni.fmi.mjt.escaperoom.room.EscapeRoom;
-import bg.sofia.uni.fmi.mjt.escaperoom.team.Team;
 
 public interface EscapeRoomAdminAPI {
 
@@ -17,7 +16,7 @@ public interface EscapeRoomAdminAPI {
      * @throws PlatformCapacityExceededException if the maximum number of escape rooms has already been reached.
      * @throws RoomAlreadyExistsException        if the specified room already exists in the platform.
      */
-    void addEscapeRoom(EscapeRoom room);
+    void addEscapeRoom(EscapeRoom room) throws RoomAlreadyExistsException;
 
     /**
      * Removes the escape room with the specified name from the platform.
