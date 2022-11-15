@@ -12,12 +12,11 @@ public class FlightScanner implements FlightScannerAPI {
     private Map<Airport, Set<Flight>> flightsMap;
     private Map<Airport, Map<Airport, Flight>> adjacencyFlightList;
 
-
-
     public FlightScanner() {
         flightsMap = new HashMap<>();
         adjacencyFlightList = new HashMap<>();
     }
+
     @Override
     public void add(Flight flight) {
         validateFlight(flight);
@@ -32,14 +31,9 @@ public class FlightScanner implements FlightScannerAPI {
         if (flights == null) {
             throw new IllegalArgumentException("flights cant be null");
         }
-        List<Flight> temp = new ArrayList<>(flights);
 
-        for (Flight flight: temp) {
-            validateFlight(flight);
-            flightsMap.putIfAbsent(flight.getFrom(), new HashSet<>());
-            flightsMap.get(flight.getFrom()).add(flight);
-
-            addToAJ(flight);
+        for (Flight flight : flights) {
+            add(flight);
         }
     }
 
@@ -47,9 +41,7 @@ public class FlightScanner implements FlightScannerAPI {
     public List<Flight> searchFlights(Airport from, Airport to) {
         validateSearchParams(from, to);
 
-        Map<Airport, Airport> prev = bfs(from);
-
-        return reconstructPath(from, to, prev);
+        return reconstructPath(from, to, bfs(from));
     }
 
     @Override
@@ -123,7 +115,7 @@ public class FlightScanner implements FlightScannerAPI {
         while (!q.isEmpty()) {
             Airport node = q.poll();
             if (flightsMap.get(node) != null) {
-                List<Flight> neighbours = new ArrayList<>(flightsMap.get(node));
+                Set<Flight> neighbours = flightsMap.get(node);
 
                 for (Flight next : neighbours) {
                     if (!visited.contains(next.getTo())) {
@@ -138,11 +130,12 @@ public class FlightScanner implements FlightScannerAPI {
         return tempMap;
     }
 
-    private List<Flight> reconstructPath(Airport from, Airport to, Map<Airport, Airport> prev) {
+    private List<Flight> reconstructPath(Airport from, Airport to, Map<Airport, Airport> revPath) {
         List<Flight> result = new ArrayList<>();
 
-        for (Airport temp = to; prev.containsKey(temp); temp = prev.get(temp)) {
-            result.add(adjacencyFlightList.get(prev.get(temp)).get(temp));
+        for (Airport currAirport = to; revPath.containsKey(currAirport); currAirport = revPath.get(currAirport)) {
+            Airport parentAirport = revPath.get(currAirport);
+            result.add(adjacencyFlightList.get(parentAirport).get(currAirport));
         }
 
         result = reverseArrayList(result);
