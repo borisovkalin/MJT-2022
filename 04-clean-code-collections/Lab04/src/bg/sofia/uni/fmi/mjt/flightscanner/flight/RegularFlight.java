@@ -71,7 +71,7 @@ public class RegularFlight implements Flight {
 
     @Override
     public void addPassengers(Collection<Passenger> passengers) throws FlightCapacityExceededException {
-        final int newPassengerCount = passengers.size();
+        int newPassengerCount = passengers.size();
         if ((currentCapacity + newPassengerCount) > totalCapacity) {
             throw new FlightCapacityExceededException("Couldn't add all passengers to flight");
         }
