@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class NutritionInfoTest {
 
-
     @Test
     void testCompactConstructorWithNegativeCarbohydrates(){
         assertThrows(IllegalArgumentException.class, () -> new NutritionInfo(-32, 100,32)
@@ -49,6 +48,5 @@ public class NutritionInfoTest {
         assertEquals(new NutritionInfo(0, 0,100).calories(),400
                 ,"calories method calculation incorrect");
     }
-
 
 }

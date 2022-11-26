@@ -15,11 +15,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class FoodDiaryTest {
+
+    private static final String DEFAULT_FOOD_NAME = "Rice";
+    private static final double DEFAULT_SERVING_SIZE = 2;
+    private static final NutritionInfo DEFAULT_NUTRITION_INFO = new NutritionInfo(70,29,1);
+    private static final FoodEntry DEFAULT_FOOD_ENTRY = new FoodEntry(DEFAULT_FOOD_NAME,DEFAULT_SERVING_SIZE,DEFAULT_NUTRITION_INFO);
+    private static final Meal DEFAULT_MEAL = Meal.DINNER;
 
     @Mock
     private NutritionInfoAPI nutritionInfoAPIMock;
@@ -27,18 +33,13 @@ public class FoodDiaryTest {
     @InjectMocks
     private DailyFoodDiary foodDiary;
 
-    private static final String DEFAULT_FOOD_NAME = "Rice";
-    private static final double DEFAULT_SERVING_SIZE = 2;
-    private static final NutritionInfo DEFAULT_NUTRITION_INFO = new NutritionInfo(70,29,1);
-    private static final FoodEntry DEFAULT_FOOD_ENTRY = new FoodEntry(DEFAULT_FOOD_NAME,DEFAULT_SERVING_SIZE,DEFAULT_NUTRITION_INFO);
-    private static final Meal DEFAULT_MEAL = Meal.DINNER;
     @Test
-    void testAddFoodWithNullMeal(){
+    void testAddFoodWithNullMeal() {
        assertThrows(IllegalArgumentException.class,() -> foodDiary.addFood(null,DEFAULT_FOOD_NAME,DEFAULT_SERVING_SIZE)
                ,"Adding Null meal should throw an IllegalArgumentException");
     }
     @Test
-    void testAddFoodWithNullName(){
+    void testAddFoodWithNullName() {
         assertThrows(IllegalArgumentException.class,() -> foodDiary.addFood(DEFAULT_MEAL,null,DEFAULT_SERVING_SIZE));
     }
     @Test
@@ -49,13 +50,15 @@ public class FoodDiaryTest {
     @Test
     void testAddFoodWithNutritionInfoAvailable() throws UnknownFoodException {
         when(nutritionInfoAPIMock.getNutritionInfo(DEFAULT_FOOD_NAME)).thenReturn(DEFAULT_NUTRITION_INFO);
+
         FoodEntry def = foodDiary.addFood(DEFAULT_MEAL,DEFAULT_FOOD_NAME,DEFAULT_SERVING_SIZE);
+
         assertEquals(DEFAULT_FOOD_ENTRY,def,"Add food method Returned a non matching FoodEntry");
     }
     @Test
     void testAddFoodWithNutritionInfoUnavailable() throws UnknownFoodException {
         when(nutritionInfoAPIMock.getNutritionInfo(DEFAULT_FOOD_NAME))
-                .thenThrow(new UnknownFoodException(String.format("No nutrition info found for %s",DEFAULT_FOOD_NAME)));
+                .thenThrow(new UnknownFoodException("Test exception: No nutrition info found for " + DEFAULT_FOOD_NAME));
 
         assertThrows(UnknownFoodException.class,() -> foodDiary.addFood(DEFAULT_MEAL,DEFAULT_FOOD_NAME,DEFAULT_SERVING_SIZE)
                 ,"Foods with no nutrition info found should throw UnknownFoodException");
@@ -74,16 +77,16 @@ public class FoodDiaryTest {
     }
 
     @Test
-    void testGetAllFoodEntriesByProteinContentSort() {
+    void testGetAllFoodEntriesByProteinContentSort() throws UnknownFoodException {
+        when(nutritionInfoAPIMock.getNutritionInfo("Beans")).thenReturn(DEFAULT_NUTRITION_INFO);
+        when(nutritionInfoAPIMock.getNutritionInfo("Mr Beans")).thenReturn(DEFAULT_NUTRITION_INFO);
+        foodDiary.addFood(DEFAULT_MEAL,"Beans",DEFAULT_SERVING_SIZE + 1);
+        foodDiary.addFood(DEFAULT_MEAL,"Mr Beans",DEFAULT_SERVING_SIZE);
+
         List<FoodEntry> foodList = foodDiary.getAllFoodEntriesByProteinContent();
-        FoodEntry previous = null;
-        for (FoodEntry blob : foodList) {
-            if (previous != null) {
-                assertTrue(previous.nutritionInfo().proteins() * previous.servingSize() >
-                        blob.nutritionInfo().proteins() * blob.servingSize());
-            }
-            previous = blob;
-        }
+
+        assertFalse(foodList.get(0).nutritionInfo().proteins() * foodList.get(0).servingSize() >
+                foodList.get(1).nutritionInfo().proteins() * foodList.get(1).servingSize());
     }
 
     @Test
@@ -101,6 +104,7 @@ public class FoodDiaryTest {
     @Test
     void testGetDailyCaloriesIntakePerMealForEmptyFoods() {
         DailyFoodDiary testDiary = new DailyFoodDiary(null);
+
         assertEquals(0.0,testDiary.getDailyCaloriesIntakePerMeal(Meal.LUNCH),
                 "getDailyCaloriesPerMeal(LUNCH) should be 0.0 for empty food storage");
         assertEquals(0.0,testDiary.getDailyCaloriesIntakePerMeal(Meal.DINNER),
