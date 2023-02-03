@@ -1,6 +1,7 @@
 package bg.sofia.uni.fmi.mjt.mail.util;
 
-public class Validator {
+public final class Validator {
+
     private static final int MAX_PRIORITY = 10;
     private static final int MIN_PRIORITY = 1;
 

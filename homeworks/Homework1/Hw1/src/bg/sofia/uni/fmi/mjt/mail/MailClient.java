@@ -2,10 +2,10 @@ package bg.sofia.uni.fmi.mjt.mail;
 
 import bg.sofia.uni.fmi.mjt.mail.exceptions.AccountAlreadyExistsException;
 import bg.sofia.uni.fmi.mjt.mail.exceptions.AccountNotFoundException;
-import bg.sofia.uni.fmi.mjt.mail.exceptions.RuleAlreadyDefinedException;
 import bg.sofia.uni.fmi.mjt.mail.exceptions.FolderAlreadyExistsException;
 import bg.sofia.uni.fmi.mjt.mail.exceptions.FolderNotFoundException;
 import bg.sofia.uni.fmi.mjt.mail.exceptions.InvalidPathException;
+import bg.sofia.uni.fmi.mjt.mail.exceptions.RuleAlreadyDefinedException;
 
 import java.util.Collection;
 
@@ -38,18 +38,18 @@ public interface MailClient {
     /**
      * Creates a new Rule for the current mail client.
      * A Rule is defined via a string called Rule Definition. Each Rule Definition contains one or more Rule Conditions.
-     *
+     * <p>
      * The following Rule Definition is the valid format for rules:
      * subject-includes: <list-of-keywords>
      * subject-or-body-includes: <list-of-keywords>
      * recipients-includes: <list-of-recipient-emails>
      * from: <sender-email>
-     *
+     * <p>
      * The order is not determined, and the list might not be full. Example:
      * subject-includes: mjt, izpit, 2022
      * subject-or-body-includes: izpit
      * from: stoyo@fmi.bg
-     *
+     * <p>
      * For subject-includes and subject-or-body-includes rule conditions,
      * if more than one keywords is specified, all must
      * be contained for the rule to match, i.e. it is a conjunction condition. For recipients-includes,
@@ -64,7 +64,8 @@ public interface MailClient {
      * @throws AccountNotFoundException    if the account does not exist
      * @throws FolderNotFoundException     if the folder does not exist
      * @throws RuleAlreadyDefinedException if the rule definition contains a rule *condition* that already exists,
-     * e.g. a rule definition contains `subject-includes` twice, or any other condition more than once.
+     *                                     e.g. a rule definition contains `subject-includes` twice, or any other
+     *                                     condition more than once.
      */
     void addRule(String accountName, String folderPath, String ruleDefinition, int priority);
 
@@ -75,7 +76,7 @@ public interface MailClient {
      * subject: <subject>
      * recipients: <list-of-emails>
      * received: <LocalDateTime> - in format yyyy-MM-dd HH:mm
-     *
+     * <p>
      * The order is not determined and the list might not be full. Example:
      * sender: testy@gmail.com
      * subject: Hello, MJT!
