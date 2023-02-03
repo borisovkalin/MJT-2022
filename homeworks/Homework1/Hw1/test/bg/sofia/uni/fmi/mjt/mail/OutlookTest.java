@@ -24,8 +24,8 @@ public class OutlookTest {
 
     private static final String DEFAULT = "DEFAULT";
 
-    private static final String DEFAULT_PATH = "/inbox";
-
+    private static final String DEFAULT_INBOX_PATH = "/inbox";
+    private static final String DEFAULT_SENT_PATH = "/sent";
     private static final String DEFAULT_RULE = "subject-includes: mjt, izpit, 2022"
             + System.lineSeparator() +
             "subject-or-body-includes: izpit"
@@ -113,7 +113,7 @@ public class OutlookTest {
 
     @Test
     void testGetMailsFromFolderWithNullAccountName() {
-        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.getMailsFromFolder(null, DEFAULT_PATH),
+        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.getMailsFromFolder(null, DEFAULT_INBOX_PATH),
                 "Expected an exception when trying to get Mails from null account");
     }
 
@@ -125,9 +125,9 @@ public class OutlookTest {
 
     @Test
     void testGetMailFromFolderWithBlankOrEmptyName() {
-        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.getMailsFromFolder("     ", DEFAULT_PATH),
+        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.getMailsFromFolder("     ", DEFAULT_INBOX_PATH),
                 "Expected an exception when trying to get Mails from blank account name");
-        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.getMailsFromFolder("", DEFAULT_PATH),
+        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.getMailsFromFolder("", DEFAULT_INBOX_PATH),
                 "Expected an exception when trying to get Mails from empty account name");
     }
 
@@ -153,39 +153,39 @@ public class OutlookTest {
 
     @Test
     void testAddRuleWithNullAccountNameOrPathFolderOrRuleDefinition() {
-        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(null, DEFAULT_PATH,DEFAULT_RULE,3),
+        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(null, DEFAULT_INBOX_PATH,DEFAULT_RULE,3),
                 "Expected exception when trying to call addRule with null accountName");
         assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, null ,DEFAULT_RULE,3),
                 "Expected exception when trying to call addRule with null path");
-        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_PATH,null,3),
+        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH,null,3),
                 "Expected exception when trying to call addRule with null ruleDefinition");
     }
 
     @Test
-    void testAddRuleWithBlankOrEmptyAccountNameOrPathFolderOrRuleDefinition() {
-        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule("", DEFAULT_PATH,DEFAULT_RULE,3),
+    void testAddRuleWithBlankAndEmptyAccountNameAndPathFolderAndRuleDefinition() {
+        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule("", DEFAULT_INBOX_PATH,DEFAULT_RULE,3),
                 "Expected exception when trying to call addRule with empty accountName");
         assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, "" ,DEFAULT_RULE,3),
                 "Expected exception when trying to call addRule with empty path");
-        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_PATH,"",3),
+        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH,"",3),
                 "Expected exception when trying to call addRule with empty ruleDefinition");
-        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule("    ", DEFAULT_PATH,DEFAULT_RULE,3),
+        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule("    ", DEFAULT_INBOX_PATH,DEFAULT_RULE,3),
                 "Expected exception when trying to call addRule with blank accountName");
         assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, "      " ,DEFAULT_RULE,3),
                 "Expected exception when trying to call addRule with blank path");
-        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_PATH,"     ",3),
+        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH,"     ",3),
                 "Expected exception when trying to call addRule with blank ruleDefinition");
     }
 
     @Test
     void testAddRuleWithNegativePriority() {
-        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH,DEFAULT_RULE,-1),
+        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH,DEFAULT_RULE,-1),
                 "Expected exception when trying to call addRule with negative priority");
     }
 
     @Test
     void testAddRuleWithExceedingCapacityPriority() {
-        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH,DEFAULT_RULE,11),
+        assertThrows(IllegalArgumentException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH,DEFAULT_RULE,11),
                 "Expected exception when trying to call addRule with Exceeded capacity priority");
     }
     @Test
@@ -196,22 +196,34 @@ public class OutlookTest {
 
     @Test
     void testAddRuleWithPathToInboxOne() {
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one");
+        OUTLOOK.addNewAccount("Stoyo", "stoyo@fmi.bg");
+
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one");
+
         OUTLOOK.receiveMail(DEFAULT_ACCOUNT_NAME,DEFAULT_METADATA,"BOO GHOSTS");
-        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH+"/one", DEFAULT_RULE,1);
-        Collection<Mail> mail = OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_PATH + "/one");
+
+        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH +"/one", DEFAULT_RULE,1);
+
+        Collection<Mail> mail = OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one");
+
         Iterator<Mail> iter = mail.iterator();
+
         Mail m = iter.next();
+
         assertEquals("BOO GHOSTS", m.body(),"Expected same body of same mails");
     }
 
     @Test
     void testAddRuleWithSameRulesAddedTwice() {
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one");
+        OUTLOOK.addNewAccount("Stoyo", "stoyo@fmi.bg");
+
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one");
+
         OUTLOOK.receiveMail(DEFAULT_ACCOUNT_NAME,DEFAULT_METADATA,"BOO GHOSTS");
+
         String repeatingRule = DEFAULT_RULE + System.lineSeparator() + DEFAULT_RULE;
-        assertThrows(RuleAlreadyDefinedException.class, () ->
-        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME ,DEFAULT_PATH + "/one",
+
+        assertThrows(RuleAlreadyDefinedException.class, () -> OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME , DEFAULT_INBOX_PATH + "/one",
                 repeatingRule,1),
                 "Trying to add Same rule configs twice");
 
@@ -219,11 +231,16 @@ public class OutlookTest {
 
     @Test
     void testAddRuleWithIllegalRule() {
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one");
+        OUTLOOK.addNewAccount("Stoyo", "stoyo@fmi.bg");
+
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one");
+
         OUTLOOK.receiveMail(DEFAULT_ACCOUNT_NAME,DEFAULT_METADATA,"BOO GHOSTS");
+
         String repeatingRule = DEFAULT_RULE + System.lineSeparator() + "unknown_rule: ";
+
         assertThrows(IllegalArgumentException.class, () ->
-                        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME ,DEFAULT_PATH + "/one",
+                        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME , DEFAULT_INBOX_PATH + "/one",
                                 repeatingRule,1),
                 "Trying to add Same rule configs twice");
 
@@ -231,12 +248,17 @@ public class OutlookTest {
 
     @Test
     void testAddRuleWithNullRecipientTwice() {
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one");
+        OUTLOOK.addNewAccount("Stoyo", "stoyo@fmi.bg");
+
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one");
+
         OUTLOOK.receiveMail(DEFAULT_ACCOUNT_NAME, DEFAULT_METADATA,"BOO GHOSTS");
-        String repeatingRule = DEFAULT_RULE + System.lineSeparator() + "recipients-includes:  "
-                + System.lineSeparator() + "recipients-includes:  ";
+
+        String repeatingRule = DEFAULT_RULE + System.lineSeparator() + "recipients-includes: Flower "
+                + System.lineSeparator() + "recipients-includes:  Flower";
+
         assertThrows(RuleAlreadyDefinedException.class, () ->
-                        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME ,DEFAULT_PATH + "/one",
+                        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME , DEFAULT_INBOX_PATH + "/one",
                                 repeatingRule,1),
                 "Trying to add Same rule configs twice");
 
@@ -244,29 +266,37 @@ public class OutlookTest {
 
     @Test
     void testReceiveOneMailWithRuleActive() {
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one");
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/two");
-        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one", DEFAULT_RULE, 1);
+        OUTLOOK.addNewAccount("Stoyo", "stoyo@fmi.bg");
+
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one");
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/two");
+
+        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one", DEFAULT_RULE, 1);
+
         OUTLOOK.receiveMail(DEFAULT_ACCOUNT_NAME, DEFAULT_METADATA,"BOO GHOSTS");
-        assertEquals(OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_PATH + "/one").size(),
+        assertEquals(OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one").size(),
                 1,"Expected mail to be moved from /inbox to /inbox/one -> rule not applied");
     }
 
     @Test
     void testReceiveOneMailWithNoRuleActive() {
         OUTLOOK.receiveMail(DEFAULT_ACCOUNT_NAME, DEFAULT_METADATA,"BOO GHOSTS");
-        assertEquals(OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_PATH).size(),
+        assertEquals(OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH).size(),
                 1,"Expected mail to be moved from /inbox to /inbox/one -> rule not applied");
     }
 
     @Test
     void testReceiveOneMailWithTwoRuleActiveWithDifferentPriority() {
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one");
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/two");
-        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one", DEFAULT_RULE, 1);
-        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/two",DEFAULT_RULE, 2);
+        OUTLOOK.addNewAccount("Stoyo", "stoyo@fmi.bg");
+
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one");
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/two");
+
+        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one", DEFAULT_RULE, 1);
+        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/two",DEFAULT_RULE, 2);
+
         OUTLOOK.receiveMail(DEFAULT_ACCOUNT_NAME, DEFAULT_METADATA,"BOO GHOSTS");
-        assertEquals(OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_PATH + "/one").size(),
+        assertEquals(OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one").size(),
                 1,"Expected mail to be moved from /inbox to /inbox/one -> rule not applied");
     }
 
@@ -274,34 +304,40 @@ public class OutlookTest {
 
     @Test
     void testReceiveOneMailWithDifferentRulesActive() {
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one");
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/two");
-        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one", DEFAULT_RULE, 1);
-        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/two","subject-includes: mjt, izpit, 2022"
+        OUTLOOK.addNewAccount("Stoyo", "stoyo@fmi.bg");
+
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one");
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/two");
+
+        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one", DEFAULT_RULE, 1);
+        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/two","subject-includes: mjt, izpit, 2022"
                 + System.lineSeparator() +
                 "subject-or-body-includes: izpit"
                 + System.lineSeparator() +
                 "from: NOTstoyo@fmi.bg", 2);
+
         OUTLOOK.receiveMail(DEFAULT_ACCOUNT_NAME, DEFAULT_METADATA,"BOO GHOSTS");
-        assertEquals(OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_PATH + "/one").size(),
+        assertEquals(OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one").size(),
                 1,"Expected mail to be moved from /inbox to /inbox/one -> rule not applied");
     }
 
     @Test
     void testReceiveOneMailWithTwoDifferentRulesActiveWithLowPriorities() {
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one");
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/two");
-        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one", DEFAULT_RULE, 10);
-        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/two","subject-includes: mjt, izpit, 2022"
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one");
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/two");
+
+        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one", DEFAULT_RULE, 10);
+        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/two","subject-includes: mjt, izpit, 2022"
                 + System.lineSeparator() +
                 "subject-or-body-includes: izpit"
                 + System.lineSeparator() +
                 "from: " + DEFAULT_ACCOUNT_NAME, 7);
+
         OUTLOOK.receiveMail(DEFAULT_ACCOUNT_NAME,  "sender: " + DEFAULT_ACCOUNT_NAME + System.lineSeparator() +
                 "subject: mjt, izpit 2022!" + System.lineSeparator() +
                 "recipients: pesho@gmail.com, gosho@gmail.com," + System.lineSeparator() +
                 "received: 2022-12-08 14:14","BOO GHOSTS");
-        assertEquals(OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_PATH + "/two").size(),
+        assertEquals(OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/two").size(),
                 1,"Expected mail to be moved from /inbox to /inbox/two -> rule not applied correctly");
     }
 
@@ -309,11 +345,44 @@ public class OutlookTest {
     void testReceiveOneMailWithOneBlankRule() {
         OUTLOOK.addNewAccount("SoyoBoyo_v1","oldstoyo@fmi.bg");
         OUTLOOK.addNewAccount("SoyoBoyo_v2","newstoyo@fmi.bg");
-        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_PATH + "/one");
-        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH + "/one", "from: NEWstoyo@fmi.bg", 1);
+
+        OUTLOOK.createFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one");
+
+        OUTLOOK.addRule(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH + "/one", "from: NEWstoyo@fmi.bg", 1);
+
         OUTLOOK.receiveMail(DEFAULT_ACCOUNT_NAME,"sender: oldstoyo@fmi.bg",DEFAULT);
-        assertEquals(OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME,DEFAULT_PATH).size(),1,
+        assertEquals(OUTLOOK.getMailsFromFolder(DEFAULT_ACCOUNT_NAME, DEFAULT_INBOX_PATH).size(),1,
                 "Expected the Email to stay in /inbox when it doesn't match any rules");
     }
+    @Test
+    void testSendMailWithTwoRecepients() {
+        OUTLOOK.addNewAccount("SoyoBoyo","stoyo@fmi.bg");
+        OUTLOOK.addNewAccount("Pe6o","pesho@gmail.com");
+        OUTLOOK.addNewAccount("Go6o", "gosho@gmail.com");
 
+        OUTLOOK.createFolder("Pe6o", DEFAULT_INBOX_PATH + "/one");
+        OUTLOOK.createFolder("Pe6o", DEFAULT_INBOX_PATH + "/two");
+        OUTLOOK.createFolder("Go6o", DEFAULT_INBOX_PATH + "/one");
+
+        OUTLOOK.addRule("Pe6o", DEFAULT_INBOX_PATH + "/two", "from: stoyo@fmi.bg", 1);
+        OUTLOOK.addRule("Go6o", DEFAULT_INBOX_PATH + "/one", "from: boystoyo@fmi.bg", 1);
+
+        String MailMetadata = "recipients: pesho@gmail.com, gosho@gmail.com" + System.lineSeparator() + "sender: stoyo@fmi.bg";
+
+        OUTLOOK.sendMail("SoyoBoyo",MailMetadata ,DEFAULT);
+
+        assertEquals(1,OUTLOOK.getMailsFromFolder("Pe6o", DEFAULT_INBOX_PATH + "/two").size(),
+                "Expected the mail to be received in the right folder. Check Rule definition enforcement");
+        assertEquals(1,OUTLOOK.getMailsFromFolder("Go6o", DEFAULT_INBOX_PATH).size(),
+                "Expected the mail to be received in the right folder. Check Rule definition enforcement");
+        assertEquals(1,OUTLOOK.getMailsFromFolder("SoyoBoyo", DEFAULT_SENT_PATH).size(),
+                "Expected the mail to be in the sent folder for sender account");
+
+    }
+
+    @Test
+    void testSendMailWithNoRecepientsField() {
+        assertThrows(IllegalArgumentException.class, () ->OUTLOOK.sendMail("Seb","from: stoyo@abv.bg",DEFAULT)
+                ,"Expected an exception to be thrown when there are no recipients for mail");
+    }
 }
